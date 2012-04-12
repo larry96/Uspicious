@@ -34,3 +34,24 @@ def build_indexes (top):
     return comments_by_file, indexed_comments, procedures_by_file, indexed_procedures
 # comments_by_file, indexed_comments, procedures_by_file, indexed_procedures =
 #  build_indexes(".")
+
+def is_list(x):
+    return isinstance(x, list)
+
+def is_dict(x):
+    return isinstance(x, dict)
+
+def nice_print_help(x, space):
+    if is_list(x):
+        for y in x:
+            print " "*space, y
+        return
+    if is_dict(x):
+        for y in x:
+            print " "*space, y
+            nice_print_help(x[y], space+4)
+        return
+    print x
+
+def nice_print(x):
+    nice_print_help(x,0)

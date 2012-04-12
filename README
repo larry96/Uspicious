@@ -13,17 +13,79 @@ $ python
 >>> # and all of the procedures with their parameters
 >>> all_from_file(procedures_by_file, './parse_file.py')
 {'parse_line_for_procedure': ['def parse_line_for_procedure(line)'], 'comments_in_file': ['def comments_in_file(filename)'], 'find_not_in_string_literal': ['def find_not_in_string_literal(s, char)'], 'parse_line_for_comment': ['def parse_line_for_comment(line)'], 'help_not_in_string_literal': ['def help_not_in_string_literal(s, char, \n                               pos)'], 'procedures_in_file': ['def procedures_in_file(filename)']}
+>>> # Those are hard to read, so let's get code to print them more nicely
+>>> from build_indexes import nice_print
+>>> nice_print(all_from_file(comments_by_file, './parse_file.py'))
+ #!/usr/bin/python
+ ###
+ #
+ # The goal here is to learn what procedures are defined in a python file
+ #
+ ###
+ # must be double quoted
+ # must be single quoted
+ # double quote is in the single-quoted string
+ # single quote is in the double-quoted string
+>>> nice_print(all_from_file(procedures_by_file, './parse_file.py'))
+ parse_line_for_procedure
+     def parse_line_for_procedure(line)
+ comments_in_file
+     def comments_in_file(filename)
+ find_not_in_string_literal
+     def find_not_in_string_literal(s, char)
+ parse_line_for_comment
+     def parse_line_for_comment(line)
+ help_not_in_string_literal
+     def help_not_in_string_literal(s, char, 
+                               pos)
+ procedures_in_file
+     def procedures_in_file(filename)
 >>> # now let's import code to look up in indexes
 >>> from index_utils import lookup
 >>> # We can find the information about the procedure walkdirectory
->>> lookup(indexed_procedures, 'walkdirectory')
-[('./crawl_directory.py', ['def walkdirectory(top)'])]
+>>> nice_print(lookup(indexed_procedures, 'walkdirectory'))
+ ./crawl_directory.py
+     def walkdirectory(top)
 >>> # or look in the comments for 'proc'
->>> lookup(indexed_comments, 'proc')
->>> # Hmm, nothing.  Maybe it was procedure
->>> lookup(indexed_comments, 'procedure')
-[('./index_utils.py', ['# Utilities for procedure and comment indexing'])]
+>>> nice_print(lookup(indexed_comments, 'proc'))
+None
+>>> # Hmm, nothing.  Maybe it was procedures
+>>> nice_print(lookup(indexed_comments, 'procedures'))
+ ./parse_file.py
+     # The goal here is to learn what procedures are defined in a python file
+ ./crawl_directory.py
+     # We need to parse each .py file for comments and procedures
+     # It produces a dictionary of file names with procedures and
+>>> # Notice how it handles two comments containing the same keyword in one file
 >>> # That's not what I was looking for either.  Let's do better.
 >>> from index_utils import lookup_contains
->>> lookup_contains(indexed_comments, 'proc')
-[('{proc', [('./index_utils.py', ['# {proc : list_of_snippets}']), ('./build_indexes.py', ['# { file : {"proc_snip" : {proc : list_of_snippets}, "comments" : list} }'])]), ('procedures', [('./parse_file.py', ['# The goal here is to learn what procedures are defined in a python file']), ('./crawl_directory.py', ['# We need to parse each .py file for comments and procedures', '# It produces a dictionary of file names with procedures and'])]), ('indexed_procedures', [('./build_indexes.py', ['# comments_by_file, indexed_comments, procedures_by_file, indexed_procedures ='])]), ('index[procedure]', [('./index_utils.py', ['# index[procedure] = { filename : [snippet] }'])]), ('Procedure', [('./crawl_directory.py', ['# Procedure for crawling the directory and adding files'])]), ('procedure', [('./index_utils.py', ['# Utilities for procedure and comment indexing'])]), ('procedures_by_file,', [('./build_indexes.py', ['# comments_by_file, indexed_comments, procedures_by_file, indexed_procedures ='])]), ('{"proc_snip"', [('./build_indexes.py', ['# { file : {"proc_snip" : {proc : list_of_snippets}, "comments" : list} }'])])]
+>>> nice_print(lookup_contains(indexed_comments, 'proc'))
+ procedures_by_file,
+     ./build_indexes.py
+         # comments_by_file, indexed_comments, procedures_by_file, indexed_procedures =
+ {proc
+     ./index_utils.py
+         # {proc : list_of_snippets}
+     ./build_indexes.py
+         # { file : {"proc_snip" : {proc : list_of_snippets}, "comments" : list} }
+ index[procedure]
+     ./index_utils.py
+         # index[procedure] = { filename : [snippet] }
+ {"proc_snip"
+     ./build_indexes.py
+         # { file : {"proc_snip" : {proc : list_of_snippets}, "comments" : list} }
+ procedure
+     ./index_utils.py
+         # Utilities for procedure and comment indexing
+ indexed_procedures
+     ./build_indexes.py
+         # comments_by_file, indexed_comments, procedures_by_file, indexed_procedures =
+ procedures
+     ./parse_file.py
+         # The goal here is to learn what procedures are defined in a python file
+     ./crawl_directory.py
+         # We need to parse each .py file for comments and procedures
+         # It produces a dictionary of file names with procedures and
+ Procedure
+     ./crawl_directory.py
+         # Procedure for crawling the directory and adding files
